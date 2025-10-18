@@ -36,7 +36,13 @@ searchButton.addEventListener('click', async () => {
 
   try {
     const response = await fetch(
-      `https://api.discogs.com/database/search?release_title=${encodeURIComponent(album)}&artist=${encodeURIComponent(artist)}&type=master&key=${discogsKey}&secret=${discogsSecret}`
+      `https://api.discogs.com/database/search?release_title=${encodeURIComponent(album)}&artist=${encodeURIComponent(artist)}&type=master`,
+      {
+        headers: {
+          'User-Agent': 'GeminiAlbumArtWebApp/1.0',
+          'Authorization': `Discogs key=${discogsKey}, secret=${discogsSecret}`,
+        },
+      }
     );
 
     if (!response.ok) {

@@ -39,10 +39,11 @@ async function main() {
     const response = await fetch(
       `https://api.discogs.com/database/search?release_title=${encodeURIComponent(
         album
-      )}&artist=${encodeURIComponent(artist)}&type=master&key=${DISCOGS_KEY}&secret=${DISCOGS_SECRET}`,
+      )}&artist=${encodeURIComponent(artist)}&type=master`,
       {
         headers: {
-          'User-Agent': 'GeminiAlbumArtCLI/1.0'
+          'User-Agent': 'GeminiAlbumArtCLI/1.0',
+          'Authorization': `Discogs key=${DISCOGS_KEY}, secret=${DISCOGS_SECRET}`,
         }
       }
     );
