@@ -1,0 +1,5 @@
+{
+  "name": "discogs-image-cli",
+  "description": "Fetch master cover photos",
+  "requestFramePermissions": []
+}
