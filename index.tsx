@@ -5,7 +5,8 @@
 
 import 'dotenv/config';
 import * as readline from 'node:readline/promises';
-// FIX: Removed explicit 'process' import. The global `process` object from the Node.js environment has the correct types for properties like `stdin`, `stdout`, `argv`, and `exit`, resolving the type errors.
+// Fix: Import `process` from `node:process` to resolve type errors for Node.js-specific properties like `stdin`, `stdout`, `argv`, and `exit`.
+import { process } from 'node:process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';

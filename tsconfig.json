@@ -9,12 +9,10 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react-jsx"
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "*.ts",
-    "*.tsx"
+    "index.ts"
   ],
   "exclude": [
     "node_modules",
