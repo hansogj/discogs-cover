@@ -12,12 +12,11 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "index.ts"
+    "index.tsx"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "*.js",
-    "*.tsx"
+    "*.js"
   ]
 }
