@@ -1,17 +1,22 @@
+
 {
-  "name": "discogs-cli",
-  "version": "1.0.0",
-  "description": "A CLI tool to find album art from Discogs.",
-  "main": "discogs-cli.js",
+  "name": "@hansogj/discogs-cover",
+  "version": "1.2.0",
+  "description": "A library and CLI to find and download album cover art from Discogs.",
+  "main": "index.js",
   "type": "module",
+  "bin": {
+    "discogs-cover": "./discogs-cover-cli.js"
+  },
   "scripts": {
-    "start": "node discogs-cli.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "discogs",
-    "cli",
-    "music",
-    "album art"
+    "album",
+    "cover",
+    "art",
+    "cli"
   ],
   "author": "",
   "license": "Apache-2.0",

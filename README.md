@@ -1,70 +1,90 @@
-# Album Art Finder CLI
 
-A command-line tool to find and download album art from Discogs.
+# Discogs Cover Art Finder
 
-## Prerequisites
-
-- Node.js (v18 or higher recommended)
-- A Discogs account and a **Personal Access Token**. You can generate one from your [Discogs developer settings page](https://www.discogs.com/settings/developers).
+A simple and powerful tool to find and download the main cover art for any album from Discogs. It can be used as a command-line tool or as a library in your own Node.js projects.
 
 ## Setup
 
-1.  **Clone the repository or download the files.**
-
-2.  **Install dependencies:**
-    Open your terminal in the project directory and run:
+1.  **Clone the repository and install dependencies:**
     ```bash
     npm install
     ```
 
-3.  **Set Environment Variables:**
-    This tool loads API keys from a `.env` file in the project's root directory.
+2.  **Create a `.env` file:**
+    Copy the `.env.example` to a new file named `.env`.
 
-    a. Create a `.env` file by copying the example file (if one exists) or creating a new one.
-    
-    b. Open the `.env` file in a text editor.
-
-    c. Add your Discogs Personal Access Token:
-    ```
-    DISCOGS_TOKEN=your_discogs_personal_access_token
-    ```
-    **Important:** The `.env` file contains sensitive information. Do not commit it to version control. The `.gitignore` file (if you are using one) should contain a line for `.env`.
-
-4.  **Make the script executable (optional, for macOS/Linux):**
-    This allows you to run the script directly.
     ```bash
-    chmod +x discogs-cli.js
+    cp .env.example .env
     ```
 
-## Usage
+3.  **Get a Discogs Personal Access Token:**
+    *   Go to your Discogs [Developer Settings](https://www.discogs.com/settings/developers).
+    *   Click "Generate new token".
+    *   Copy the generated token.
 
-Run the script from your terminal using named arguments. The `-artist` and `-title` arguments are required. The order of arguments does not matter. Make sure to enclose values with spaces in quotes.
+4.  **Add your token to the `.env` file:**
+    Open your `.env` file and paste your token:
+    ```
+    DISCOGS_TOKEN=YourDiscogsTokenGoesHere
+    ```
+
+## CLI Usage
+
+The command-line tool allows you to quickly download cover art from your terminal. It will interactively prompt you if multiple matches are found.
 
 **Syntax:**
 ```bash
-node discogs-cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="<Target Folder>"]
+node discogs-cover-cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
 ```
 
-**If you made it executable:**
+**Arguments:**
+*   `-artist`: The name of the artist (required).
+*   `-title`: The title of the album (required).
+*   `-target`: The folder where `cover.jpg` will be saved. Defaults to the current directory (`.`).
+
+**Example:**
 ```bash
-./discogs-cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="<Target Folder>"]
+node discogs-cover-cli.js -artist="Daft Punk" -title="Discovery" -target="./downloads"
 ```
 
-### Examples
+## Library Usage
 
-**Save to current directory:**
+You can import the core function into your own Node.js projects to programmatically fetch cover art.
+
+**Installation:**
 ```bash
-./discogs-cli.js -artist="Daft Punk" -title="Discovery"
+npm install @hansogj/discogs-cover
 ```
 
-**Different order:**
-```bash
-./discogs-cli.js -title="Discovery" -artist="Daft Punk"
-```
+**Example:**
+```javascript
+import { discogsMainCover } from '@hansogj/discogs-cover';
+import * as fs from 'node:fs';
 
-**Save to a specific directory (e.g., '~/Downloads/Covers'):**
-```bash
-./discogs-cli.js -artist="Daft Punk" -title="Discovery" -target="~/Downloads/Covers"
-```
+// --- Option 1: Get the first result automatically ---
+try {
+  const imageBuffer = await discogsMainCover({
+    artist: 'Daft Punk',
+    title: 'Discovery',
+    strategy: 'first', // 'first' is the default
+  });
+  fs.writeFileSync('daft-punk-cover.jpg', imageBuffer);
+  console.log('Cover saved!');
+} catch (error) {
+  console.error(error.message);
+}
 
-If multiple matches are found, the script will prompt you to select the correct one from a list.
+
+// --- Option 2: Prompt the user in the console if multiple matches exist ---
+try {
+  const imageBuffer = await discogsMainCover({
+    artist: 'Radiohead',
+    title: 'OK Computer',
+    strategy: 'prompt', // Will ask user to choose from a list
+  });
+  fs.writeFileSync('radiohead-cover.jpg', imageBuffer);
+  console.log('Cover saved!');
+} catch (error) {
+  console.error(error.message);
+}
+```
