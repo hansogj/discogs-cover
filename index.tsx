@@ -1,202 +1,174 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import 'dotenv/config';
-import * as readline from 'node:readline/promises';
-// Fix: Import `process` from `node:process` to resolve type errors for Node.js-specific properties like `stdin`, `stdout`, `argv`, and `exit`.
-import { process } from 'node:process';
+import * as dotenv from 'dotenv';
+import * as readline from 'node:readline';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// --- TYPE DEFINITIONS & LIBRARY ---
+dotenv.config();
 
-interface DiscogsSearchResultItem {
-  title: string;
-  year?: string;
-  cover_image: string;
-  resource_url: string;
+// Type Definitions
+interface DiscogsSearchResult {
+    id: number;
+    title: string;
+    cover_image: string;
+    resource_url: string;
 }
 
 interface DiscogsSearchResponse {
-  results: DiscogsSearchResultItem[];
+    results: DiscogsSearchResult[];
 }
 
-export type DiscogsCoverStrategy = 'first' | 'prompt';
-
-export interface DiscogsCoverOptions {
-  /** The name of the artist. */
-  artist: string;
-  /** The title of the album. */
-  title: string;
-  /**
-   * The strategy to use when multiple results are found.
-   * 'first' - (Default) Selects the first result automatically.
-   * 'prompt' - Asks the user to select from a list in the console.
-   */
-  strategy?: DiscogsCoverStrategy;
+interface DiscogsMasterReleaseResponse {
+    images: {
+        uri: string;
+        type: 'primary' | 'secondary';
+    }[];
 }
 
-/**
- * Fetches data from a given Discogs API URL.
- * @param url The Discogs API URL to fetch.
- * @returns The JSON response from the API.
- */
-async function fetchDiscogs<T>(url: string): Promise<T> {
-  const token = process.env.DISCOGS_TOKEN;
-  if (!token) {
-    throw new Error('DISCOGS_TOKEN is not set in your environment.');
-  }
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'HansogjDiscogsCover/1.0',
-      Authorization: `Discogs token=${token}`,
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`Discogs API error: ${response.status} ${response.statusText}`);
-  }
-  return response.json() as Promise<T>;
+interface DiscogsCoverOptions {
+    artist: string;
+    title: string;
+    strategy?: 'first' | 'prompt';
+    token?: string;
 }
 
-/**
- * Downloads an image from a URL and returns it as a Buffer.
- * @param url The URL of the image to download.
- * @returns A Buffer containing the image data.
- */
-async function downloadImage(url: string): Promise<Buffer> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to download image: ${response.statusText}`);
-  }
-  const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
-}
+const DISCOGS_API_URL = 'https://api.discogs.com';
+const USER_AGENT = 'DiscogsCover/1.2.0';
 
-/**
- * Prompts the user to select an item from a list of results.
- * @param results The list of results from the Discogs API.
- * @returns The item selected by the user.
- */
-async function promptUser(
-  results: DiscogsSearchResultItem[]
-): Promise<DiscogsSearchResultItem> {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  console.log('\nMultiple results found. Please select one:');
-  results.forEach((item, index) => {
-    console.log(`${index + 1}: ${item.title} (${item.year || 'N/A'})`);
-  });
-
-  let selectedIndex = -1;
-  while (selectedIndex < 0 || selectedIndex >= results.length) {
-    const answer = await rl.question(
-      `Enter a number (1-${results.length}): `
-    );
-    const num = parseInt(answer, 10) - 1;
-    if (!isNaN(num) && num >= 0 && num < results.length) {
-      selectedIndex = num;
-    } else {
-      console.log('Invalid selection. Please try again.');
-    }
-  }
-  rl.close();
-  return results[selectedIndex];
-}
-
-/**
- * Finds the main cover for a given artist and album title from Discogs.
- * @param options An object containing the artist, title, and optional strategy.
- * @returns A Promise that resolves with a Buffer containing the cover image data.
- */
-export async function discogsMainCover({
-  artist,
-  title,
-  strategy = 'first',
-}: DiscogsCoverOptions): Promise<Buffer> {
-  if (!artist || !title) {
-    throw new Error('Artist and title are required.');
-  }
-
-  const searchUrl = `https://api.discogs.com/database/search?release_title=${encodeURIComponent(
-    title
-  )}&artist=${encodeURIComponent(artist)}&type=master`;
-  const data = await fetchDiscogs<DiscogsSearchResponse>(searchUrl);
-
-  if (!data.results || data.results.length === 0) {
-    throw new Error('No results found for this artist and album.');
-  }
-
-  let selectedItem: DiscogsSearchResultItem;
-  if (data.results.length > 1 && strategy === 'prompt') {
-    selectedItem = await promptUser(data.results);
-  } else {
-    selectedItem = data.results[0];
-  }
-
-  const coverUrl = selectedItem.cover_image;
-  if (!coverUrl || coverUrl.includes('default-release.png')) {
-    throw new Error('No cover image available for this release.');
-  }
-
-  return downloadImage(coverUrl);
-}
-
-// --- CLI LOGIC ---
-
-interface CliArgs {
-  [key: string]: string | undefined;
-}
-
-function parseArgs(): CliArgs {
-  return process.argv.slice(2).reduce<CliArgs>((acc, arg) => {
-    const [key, value] = arg.split('=');
-    const cleanKey = key.replace(/^-{1,2}/, '');
-    const cleanValue =
-      value && value.startsWith('"') && value.endsWith('"')
-        ? value.slice(1, -1)
-        : value;
-    acc[cleanKey] = cleanValue;
-    return acc;
-  }, {});
-}
-
-async function runCli(): Promise<void> {
-  const args = parseArgs();
-  const artist = args.artist;
-  const title = args.title;
-  const targetFolder = args.target || '.';
-
-  if (!artist || !title) {
-    console.error('Error: -artist and -title are required arguments.');
-    console.error(
-      'Usage: discogs-cover -artist="Artist Name" -title="Album Title" [-target="/path/to/folder"]'
-    );
-    process.exit(1);
-  }
-
-  try {
-    console.log(`Searching for "${title}" by ${artist}...`);
-    const imageBuffer = await discogsMainCover({
-      artist,
-      title,
-      strategy: 'prompt',
+async function fetchDiscogs<T>(url: string, token: string): Promise<T> {
+    const response = await fetch(url, {
+        headers: {
+            'User-Agent': USER_AGENT,
+            'Authorization': `Discogs token=${token}`,
+        },
     });
-    await fs.promises.mkdir(targetFolder, { recursive: true });
-    const filename = `cover.jpg`;
-    const fullPath = path.resolve(targetFolder, filename);
-    await fs.promises.writeFile(fullPath, imageBuffer);
-    console.log(`\n✅ Cover image saved to ${fullPath}`);
-  } catch (error: any) {
-    console.error(`\nAn error occurred: ${error.message}`);
-    process.exit(1);
-  }
+
+    if (!response.ok) {
+        throw new Error(`Discogs API error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json() as Promise<T>;
 }
 
-// --- EXECUTION ---
+async function downloadImage(url: string): Promise<Buffer> {
+    const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+    if (!response.ok) {
+        throw new Error(`Failed to download image: ${response.status} ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+}
 
-// Run the CLI only when the script is executed directly
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  runCli();
+function promptUser(query: string): Promise<string> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    return new Promise((resolve) => {
+        rl.question(query, (answer) => {
+            rl.close();
+            resolve(answer);
+        });
+    });
+}
+
+export async function discogsMainCover({
+    artist,
+    title,
+    strategy = 'first',
+    token = process.env.DISCOGS_TOKEN,
+}: DiscogsCoverOptions): Promise<Buffer> {
+    if (!token) {
+        throw new Error('Discogs token is missing. Please provide it via options or .env file (DISCOGS_TOKEN).');
+    }
+
+    const searchUrl = `${DISCOGS_API_URL}/database/search?type=master&artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`;
+    const searchData = await fetchDiscogs<DiscogsSearchResponse>(searchUrl, token);
+
+    if (!searchData.results || searchData.results.length === 0) {
+        throw new Error(`No results found for "${artist} - ${title}"`);
+    }
+
+    let selectedRelease: DiscogsSearchResult | undefined;
+
+    if (strategy === 'first' || searchData.results.length === 1) {
+        selectedRelease = searchData.results[0];
+    } else if (strategy === 'prompt') {
+        console.log('Multiple results found. Please choose one:');
+        searchData.results.forEach((result, index) => {
+            console.log(`[${index + 1}] ${result.title}`);
+        });
+
+        const answer = await promptUser('Enter the number of your choice: ');
+        const choice = parseInt(answer, 10);
+
+        if (isNaN(choice) || choice < 1 || choice > searchData.results.length) {
+            throw new Error('Invalid choice.');
+        }
+        selectedRelease = searchData.results[choice - 1];
+    }
+    
+    if (!selectedRelease) {
+         throw new Error('Could not determine a release to fetch cover from.');
+    }
+
+    const masterData = await fetchDiscogs<DiscogsMasterReleaseResponse>(selectedRelease.resource_url, token);
+    const primaryImage = masterData.images?.find(img => img.type === 'primary');
+    
+    if (!primaryImage?.uri) {
+        if (selectedRelease.cover_image) {
+             return downloadImage(selectedRelease.cover_image);
+        }
+        throw new Error('No primary image found for the selected release.');
+    }
+
+    return downloadImage(primaryImage.uri);
+}
+
+// --- CLI Logic ---
+async function runCli() {
+    try {
+        const args = process.argv.slice(2).reduce((acc, arg) => {
+            const [key, value] = arg.split('=');
+            acc[key.replace(/^-+/, '')] = value.replace(/"/g, '');
+            return acc;
+        }, {} as Record<string, string>);
+
+        const { artist, title, target = '.' } = args;
+
+        if (!artist || !title) {
+            console.error('Usage: discogs-cover -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]');
+            process.exit(1);
+        }
+
+        console.log(`Searching for "${artist} - ${title}"...`);
+        const imageBuffer = await discogsMainCover({ artist, title, strategy: 'prompt' });
+
+        const targetPath = path.resolve(target);
+        if (!fs.existsSync(targetPath)) {
+            fs.mkdirSync(targetPath, { recursive: true });
+        }
+        const filePath = path.join(targetPath, 'cover.jpg');
+        fs.writeFileSync(filePath, imageBuffer);
+
+        console.log(`Cover art successfully saved to ${filePath}`);
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(`Error: ${error.message}`);
+        } else {
+            console.error('An unknown error occurred', error);
+        }
+        process.exit(1);
+    }
+}
+
+// Check if running as a script
+try {
+    const isRunningDirectly = process.argv[1] === fileURLToPath(import.meta.url);
+    if (isRunningDirectly) {
+        runCli();
+    }
+} catch (e) {
+    // This can fail in some environments (like the web), so we'll just ignore it.
 }

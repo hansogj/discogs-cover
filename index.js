@@ -1,2 +1,2 @@
-// This file is a deprecated stub from the original JavaScript version.
-// The project is now written in TypeScript. Please use the compiled output in the `dist` folder.
+// This file has been renamed to index.ts.
+// Please run `npm run build` and use the output from the `dist` folder.
