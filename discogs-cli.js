@@ -12,7 +12,19 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as https from 'node:https';
 
-// Check for required environment variables
+// --- Argument Parser ---
+const args = process.argv.slice(2).reduce((acc, arg) => {
+  const [key, value] = arg.split('=');
+  const cleanKey = key.replace(/^-{1,2}/, ''); // Remove leading dashes
+  // Remove quotes from value if they exist
+  const cleanValue = value && value.startsWith('"') && value.endsWith('"')
+    ? value.slice(1, -1)
+    : value;
+  acc[cleanKey] = cleanValue;
+  return acc;
+}, {});
+
+// --- Configuration and Validation ---
 const { DISCOGS_TOKEN } = process.env;
 
 if (!DISCOGS_TOKEN) {
@@ -23,12 +35,13 @@ if (!DISCOGS_TOKEN) {
   process.exit(1);
 }
 
-// Get command-line arguments
-const [artist, album, targetFolder = '.'] = process.argv.slice(2);
+const artist = args.artist;
+const album = args.title;
+const targetFolder = args.target || '.';
 
 if (!artist || !album) {
-  console.error('Error: Artist and album title are required.');
-  console.error('Usage: ./discogs-cli.js "Artist Name" "Album Title" ["/path/to/folder"]');
+  console.error('Error: -artist and -title are required arguments.');
+  console.error('Usage: ./discogs-cli.js -artist="Artist Name" -title="Album Title" [-target="/path/to/folder"]');
   process.exit(1);
 }
 
