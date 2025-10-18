@@ -1,6 +1,6 @@
 # Album Art Finder CLI
 
-A command-line tool to find album art from Discogs.
+A command-line tool to find and download album art from Discogs.
 
 ## Prerequisites
 
@@ -38,22 +38,28 @@ A command-line tool to find album art from Discogs.
 
 ## Usage
 
-Run the script from your terminal, passing the artist and album title as arguments. Make sure to enclose arguments with spaces in quotes.
+Run the script from your terminal, passing the artist and album title as arguments. Make sure to enclose arguments with spaces in quotes. You can also provide an optional third argument for the folder where the image will be saved. If omitted, it will save in the current directory.
 
 **Syntax:**
 ```bash
-node discogs-cli.js "<Artist Name>" "<Album Title>"
+node discogs-cli.js "<Artist Name>" "<Album Title>" ["<Target Folder>"]
 ```
 
 **If you made it executable:**
 ```bash
-./discogs-cli.js "<Artist Name>" "<Album Title>"
+./discogs-cli.js "<Artist Name>" "<Album Title>" ["<Target Folder>"]
 ```
 
-### Example
+### Examples
 
+**Save to current directory:**
 ```bash
 ./discogs-cli.js "Daft Punk" "Discovery"
+```
+
+**Save to a specific directory (e.g., '~/Downloads/Covers'):**
+```bash
+./discogs-cli.js "Daft Punk" "Discovery" "~/Downloads/Covers"
 ```
 
 If multiple matches are found, the script will prompt you to select the correct one from a list.

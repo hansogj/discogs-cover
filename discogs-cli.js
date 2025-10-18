@@ -8,6 +8,9 @@
 import 'dotenv/config';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import * as https from 'node:https';
 
 // Check for required environment variables
 const { DISCOGS_TOKEN } = process.env;
@@ -21,11 +24,11 @@ if (!DISCOGS_TOKEN) {
 }
 
 // Get command-line arguments
-const [artist, album] = process.argv.slice(2);
+const [artist, album, targetFolder = '.'] = process.argv.slice(2);
 
 if (!artist || !album) {
   console.error('Error: Artist and album title are required.');
-  console.error('Usage: ./discogs-cli.js "Artist Name" "Album Title"');
+  console.error('Usage: ./discogs-cli.js "Artist Name" "Album Title" ["/path/to/folder"]');
   process.exit(1);
 }
 
@@ -65,7 +68,7 @@ async function main() {
     }
     
     if (selectedItem) {
-        processSelectedItem(selectedItem);
+        await processSelectedItem(selectedItem);
     }
 
   } catch (error) {
@@ -97,7 +100,7 @@ async function promptForSelection(results) {
   return results[choice - 1];
 }
 
-function processSelectedItem(item) {
+async function processSelectedItem(item) {
     const coverUrl = item.cover_image;
 
     if (!coverUrl || coverUrl.includes('default-release.png')) {
@@ -105,6 +108,38 @@ function processSelectedItem(item) {
     } else {
         console.log('\n✅ Cover Image URL:');
         console.log(coverUrl);
+        await downloadImage(coverUrl);
+    }
+}
+
+async function downloadImage(url) {
+    const filename = `cover.jpg`;
+    const fullPath = path.resolve(targetFolder, filename);
+
+    try {
+        // Ensure the target directory exists
+        await fs.promises.mkdir(targetFolder, { recursive: true });
+
+        console.log(`\nDownloading to ${fullPath}...`);
+
+        const fileStream = fs.createWriteStream(fullPath);
+        
+        await new Promise((resolve, reject) => {
+            https.get(url, (response) => {
+                response.pipe(fileStream);
+                fileStream.on('finish', () => {
+                    fileStream.close();
+                    console.log('✅ Download complete!');
+                    resolve();
+                });
+            }).on('error', (err) => {
+                fs.unlink(fullPath, () => {}); // Delete the file on error
+                reject(err);
+            });
+        });
+
+    } catch (error) {
+        console.error('Failed to download image:', error.message);
     }
 }
 

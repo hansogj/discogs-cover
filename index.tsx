@@ -97,7 +97,35 @@ function displayCover(item: any) {
   img.alt = `Cover art for ${item.title}`;
   img.className = 'cover-art';
 
-  resultsContainer.append(img);
+  const downloadButton = document.createElement('button');
+  downloadButton.textContent = 'Download Cover';
+  downloadButton.className = 'download-button';
+  downloadButton.onclick = () => downloadImage(coverUrl);
+  
+  resultsContainer.append(img, downloadButton);
+}
+
+async function downloadImage(url: string) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok.');
+        const blob = await response.blob();
+        
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        
+        a.href = objectUrl;
+        a.download = `cover.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objectUrl);
+
+    } catch (error) {
+        console.error('Download failed:', error);
+        displayError('Could not download image.');
+    }
 }
 
 function displayError(message: string) {
