@@ -100,6 +100,7 @@ async function getFirstCover() {
       artist: 'Daft Punk',
       title: 'Discovery',
       strategy: 'first', // 'first' is the default
+      token: "MY_SECRET_TOKEN", // optioanl, will default to DISCOGS_TOKEN from `.env` but should be overidde nwhen envoked as a function as part of an external runtime 
     });
     fs.writeFileSync('daft-punk-cover.jpg', imageBuffer);
     console.log('Cover saved!');
