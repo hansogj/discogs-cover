@@ -38,7 +38,7 @@ After building the project (`npm run build`), you can run the CLI. It will inter
 
 **Syntax:**
 ```bash
-node dist/discogs-cover-cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
+node dist/index.js -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
 ```
 
 Or using npm:
@@ -70,14 +70,32 @@ You can import the core function into your own Node.js projects to programmatica
 npm install @hansogj/discogs-cover
 ```
 
+**Using Environment Variables (`.env`)**
+
+The `discogsMainCover` function is designed to automatically use the `DISCOGS_TOKEN` from your environment variables. To load this token from a `.env` file in your own project, you'll need the `dotenv` package.
+
+1.  Install `dotenv`:
+    ```bash
+    npm install dotenv
+    ```
+
+2.  Load the `.env` file at the very start of your script by adding `dotenv.config();`.
+
+This setup allows you to call `discogsMainCover` without manually passing the token, as it will be picked up from `process.env`.
+
 **Example (TypeScript):**
 ```typescript
 import { discogsMainCover } from '@hansogj/discogs-cover';
 import * as fs from 'node:fs';
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 // --- Get the first result automatically (using async/await) ---
 async function getFirstCover() {
   try {
+    // No need to pass the token here, it's read from process.env.DISCOGS_TOKEN
     const imageBuffer: Buffer = await discogsMainCover({
       artist: 'Daft Punk',
       title: 'Discovery',

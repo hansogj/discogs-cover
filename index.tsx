@@ -117,7 +117,7 @@ export async function discogsMainCover({
     if (!primaryImage?.uri) {
         if (selectedRelease.cover_image) {
              return downloadImage(selectedRelease.cover_image);
-        }
+        }discogsMainCover
         throw new Error('No primary image found for the selected release.');
     }
 
