@@ -6,14 +6,13 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "bin": {
-    "discogs-cover": "dist/discogs-cover-cli.js"
+    "discogs-cover": "dist/index.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsc",
-    "start": "node dist/discogs-cover-cli.js",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

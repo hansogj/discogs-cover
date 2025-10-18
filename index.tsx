@@ -5,11 +5,13 @@
 
 import 'dotenv/config';
 import * as readline from 'node:readline/promises';
-// FIX: The deconstructed import from 'node:process' can cause issues in some TypeScript configurations.
-// Using a namespace import and accessing stdin/stdout directly is a more robust approach.
-import * as process from 'node:process';
+// FIX: Removed explicit 'process' import. The global `process` object from the Node.js environment has the correct types for properties like `stdin`, `stdout`, `argv`, and `exit`, resolving the type errors.
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// Type definitions
+// --- TYPE DEFINITIONS & LIBRARY ---
+
 interface DiscogsSearchResultItem {
   title: string;
   year?: string;
@@ -80,7 +82,6 @@ async function downloadImage(url: string): Promise<Buffer> {
 async function promptUser(
   results: DiscogsSearchResultItem[]
 ): Promise<DiscogsSearchResultItem> {
-  // FIX: Use process.stdin and process.stdout directly from the imported process module.
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   console.log('\nMultiple results found. Please select one:');
   results.forEach((item, index) => {
@@ -139,4 +140,62 @@ export async function discogsMainCover({
   }
 
   return downloadImage(coverUrl);
+}
+
+// --- CLI LOGIC ---
+
+interface CliArgs {
+  [key: string]: string | undefined;
+}
+
+function parseArgs(): CliArgs {
+  return process.argv.slice(2).reduce<CliArgs>((acc, arg) => {
+    const [key, value] = arg.split('=');
+    const cleanKey = key.replace(/^-{1,2}/, '');
+    const cleanValue =
+      value && value.startsWith('"') && value.endsWith('"')
+        ? value.slice(1, -1)
+        : value;
+    acc[cleanKey] = cleanValue;
+    return acc;
+  }, {});
+}
+
+async function runCli(): Promise<void> {
+  const args = parseArgs();
+  const artist = args.artist;
+  const title = args.title;
+  const targetFolder = args.target || '.';
+
+  if (!artist || !title) {
+    console.error('Error: -artist and -title are required arguments.');
+    console.error(
+      'Usage: discogs-cover -artist="Artist Name" -title="Album Title" [-target="/path/to/folder"]'
+    );
+    process.exit(1);
+  }
+
+  try {
+    console.log(`Searching for "${title}" by ${artist}...`);
+    const imageBuffer = await discogsMainCover({
+      artist,
+      title,
+      strategy: 'prompt',
+    });
+    await fs.promises.mkdir(targetFolder, { recursive: true });
+    const filename = `cover.jpg`;
+    const fullPath = path.resolve(targetFolder, filename);
+    await fs.promises.writeFile(fullPath, imageBuffer);
+    console.log(`\n✅ Cover image saved to ${fullPath}`);
+  } catch (error: any) {
+    console.error(`\nAn error occurred: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+// --- EXECUTION ---
+
+// Run the CLI only when the script is executed directly
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  runCli();
 }
