@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv';
 import * as readline from 'node:readline';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 dotenv.config();
 
@@ -164,11 +163,6 @@ async function runCli() {
 }
 
 // Check if running as a script
-try {
-    const isRunningDirectly = process.argv[1] === fileURLToPath(import.meta.url);
-    if (isRunningDirectly) {
-        runCli();
-    }
-} catch (e) {
-    // This can fail in some environments (like the web), so we'll just ignore it.
+if (require.main === module) {
+    runCli();
 }

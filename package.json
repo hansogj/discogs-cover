@@ -4,7 +4,6 @@
   "description": "A library and CLI to find and download album cover art from Discogs.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "bin": {
     "discogs-cover": "dist/index.js"
   },
@@ -12,6 +11,7 @@
     "dist"
   ],
   "scripts": {
+    "cli": "node dist/index.js",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
