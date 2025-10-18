@@ -1,7 +1,7 @@
 {
   "name": "discogs-cli",
   "version": "1.0.0",
-  "description": "A CLI tool to find album art from Discogs and get facts with Gemini.",
+  "description": "A CLI tool to find album art from Discogs.",
   "main": "discogs-cli.js",
   "type": "module",
   "scripts": {
@@ -9,14 +9,13 @@
   },
   "keywords": [
     "discogs",
-    "gemini",
     "cli",
-    "music"
+    "music",
+    "album art"
   ],
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@google/genai": "^0.14.0",
     "dotenv": "^16.4.5"
   }
 }

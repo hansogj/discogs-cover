@@ -1,12 +1,11 @@
 # Album Art Finder CLI
 
-A command-line tool to find album art from Discogs and get interesting facts about the album using the Google Gemini API.
+A command-line tool to find album art from Discogs.
 
 ## Prerequisites
 
 - Node.js (v18 or higher recommended)
-- A Discogs account and API credentials (Consumer Key and Secret). You can get them from the [Discogs developers page](https://www.discogs.com/developers).
-- A Google Gemini API Key. You can get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
+- A Discogs account and a **Personal Access Token**. You can generate one from your [Discogs developer settings page](https://www.discogs.com/settings/developers).
 
 ## Setup
 
@@ -21,19 +20,13 @@ A command-line tool to find album art from Discogs and get interesting facts abo
 3.  **Set Environment Variables:**
     This tool loads API keys from a `.env` file in the project's root directory.
 
-    a. Create a `.env` file by copying the example file:
-    ```bash
-    cp .env.example .env
-    ```
-    (On Windows, you can use `copy .env.example .env`)
+    a. Create a `.env` file by copying the example file (if one exists) or creating a new one.
+    
+    b. Open the `.env` file in a text editor.
 
-    b. Open the newly created `.env` file in a text editor.
-
-    c. Replace the placeholder values with your actual API keys:
+    c. Add your Discogs Personal Access Token:
     ```
-    DISCOGS_KEY=your_discogs_consumer_key
-    DISCOGS_SECRET=your_discogs_consumer_secret
-    API_KEY=your_gemini_api_key
+    DISCOGS_TOKEN=your_discogs_personal_access_token
     ```
     **Important:** The `.env` file contains sensitive information. Do not commit it to version control. The `.gitignore` file (if you are using one) should contain a line for `.env`.
 
@@ -63,4 +56,4 @@ node discogs-cli.js "<Artist Name>" "<Album Title>"
 ./discogs-cli.js "Daft Punk" "Discovery"
 ```
 
-If multiple matches are found, the script will prompt you to select the correct one from a list. After finding the album, it will ask if you want to fetch facts from Gemini.
+If multiple matches are found, the script will prompt you to select the correct one from a list.

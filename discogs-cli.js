@@ -6,18 +6,17 @@
  */
 
 import 'dotenv/config';
-import { GoogleGenAI } from '@google/genai';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 
 // Check for required environment variables
-const { DISCOGS_KEY, DISCOGS_SECRET, API_KEY } = process.env;
+const { DISCOGS_TOKEN } = process.env;
 
-if (!DISCOGS_KEY || !DISCOGS_SECRET || !API_KEY) {
+if (!DISCOGS_TOKEN) {
   console.error(
     'Error: Missing required environment variables.'
   );
-  console.error('Please create a .env file and set DISCOGS_KEY, DISCOGS_SECRET, and API_KEY. See README.md for details.');
+  console.error('Please create a .env file and set DISCOGS_TOKEN. See README.md for details.');
   process.exit(1);
 }
 
@@ -30,7 +29,6 @@ if (!artist || !album) {
   process.exit(1);
 }
 
-const ai = new GoogleGenAI({apiKey: API_KEY});
 const rl = readline.createInterface({ input, output });
 
 async function main() {
@@ -42,8 +40,8 @@ async function main() {
       )}&artist=${encodeURIComponent(artist)}&type=master`,
       {
         headers: {
-          'User-Agent': 'GeminiAlbumArtCLI/1.0',
-          'Authorization': `Discogs key=${DISCOGS_KEY}, secret=${DISCOGS_SECRET}`,
+          'User-Agent': 'AlbumArtCLI/1.0',
+          'Authorization': `Discogs token=${DISCOGS_TOKEN}`,
         }
       }
     );
@@ -67,7 +65,7 @@ async function main() {
     }
     
     if (selectedItem) {
-        await processSelectedItem(selectedItem);
+        processSelectedItem(selectedItem);
     }
 
   } catch (error) {
@@ -99,7 +97,7 @@ async function promptForSelection(results) {
   return results[choice - 1];
 }
 
-async function processSelectedItem(item) {
+function processSelectedItem(item) {
     const coverUrl = item.cover_image;
 
     if (!coverUrl || coverUrl.includes('default-release.png')) {
@@ -108,31 +106,6 @@ async function processSelectedItem(item) {
         console.log('\n✅ Cover Image URL:');
         console.log(coverUrl);
     }
-
-    const getFacts = await rl.question('\nWould you like to get interesting facts about this album? (y/n) ');
-    if (getFacts.toLowerCase() === 'y') {
-        const [artistName, albumName] = item.title.split(' - ');
-        await getGeminiFacts(artistName, albumName);
-    }
 }
-
-async function getGeminiFacts(artistName, albumName) {
-    console.log('\n🤖 Asking Gemini for facts...');
-    try {
-        const prompt = `Tell me some interesting facts about the album "${albumName}" by the artist "${artistName}".`;
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        
-        console.log('\n--- Album Facts ---');
-        console.log(response.text);
-        console.log('-------------------');
-
-    } catch (error) {
-        console.error('Gemini API error:', error);
-    }
-}
-
 
 main();

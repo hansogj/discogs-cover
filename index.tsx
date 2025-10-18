@@ -2,28 +2,21 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import { GoogleGenAI } from '@google/genai';
 
 const searchButton = document.getElementById('search-button') as HTMLButtonElement;
 const artistInput = document.getElementById('artist-name') as HTMLInputElement;
 const albumInput = document.getElementById('album-title') as HTMLInputElement;
-const discogsKeyInput = document.getElementById('discogs-key') as HTMLInputElement;
-const discogsSecretInput = document.getElementById('discogs-secret') as HTMLInputElement;
+const discogsTokenInput = document.getElementById('discogs-token') as HTMLInputElement;
 const resultsContainer = document.getElementById('results-container');
 const loader = document.getElementById('loader');
-const geminiOutputContainer = document.getElementById('gemini-output');
-const geminiTextContainer = document.getElementById('gemini-text');
-
-let ai: GoogleGenAI;
 
 searchButton.addEventListener('click', async () => {
   const artist = artistInput.value.trim();
   const album = albumInput.value.trim();
-  const discogsKey = discogsKeyInput.value.trim();
-  const discogsSecret = discogsSecretInput.value.trim();
+  const discogsToken = discogsTokenInput.value.trim();
 
-  if (!discogsKey || !discogsSecret) {
-    displayError('Please enter your Discogs API Key and Secret.');
+  if (!discogsToken) {
+    displayError('Please enter your Discogs Personal Access Token.');
     return;
   }
   if (!artist || !album) {
@@ -40,7 +33,7 @@ searchButton.addEventListener('click', async () => {
       {
         headers: {
           'User-Agent': 'GeminiAlbumArtWebApp/1.0',
-          'Authorization': `Discogs key=${discogsKey}, secret=${discogsSecret}`,
+          'Authorization': `Discogs token=${discogsToken}`,
         },
       }
     );
@@ -99,50 +92,12 @@ function displayCover(item: any) {
       return;
   }
 
-  const artist = item.title.split(' - ')[0];
-  const album = item.title.split(' - ')[1];
-
   const img = document.createElement('img');
   img.src = coverUrl;
   img.alt = `Cover art for ${item.title}`;
   img.className = 'cover-art';
 
-  const geminiButton = document.createElement('button');
-  geminiButton.textContent = 'Tell me about this album';
-  geminiButton.className = 'gemini-button';
-  geminiButton.onclick = () => getGeminiFacts(artist, album, geminiButton);
-
-  resultsContainer.append(img, geminiButton);
-}
-
-async function getGeminiFacts(artist: string, album: string, button: HTMLButtonElement) {
-    button.disabled = true;
-    button.textContent = 'Getting facts...';
-    geminiOutputContainer.classList.remove('hidden');
-    geminiTextContainer.innerHTML = '';
-
-    try {
-        // Lazily initialize AI instance
-        if (!ai) {
-             ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-        }
-       
-        const prompt = `Tell me some interesting facts about the album "${album}" by the artist "${artist}". Format the response as simple HTML paragraphs.`;
-        const response = await ai.models.generateContentStream({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-
-        for await (const chunk of response) {
-            geminiTextContainer.innerHTML += chunk.text.replace(/\n/g, '<br>');
-        }
-    } catch (error) {
-        console.error('Gemini API error:', error);
-        geminiTextContainer.textContent = 'Sorry, I couldn\'t fetch facts for this album.';
-    } finally {
-        button.disabled = false;
-        button.textContent = 'Tell me about this album';
-    }
+  resultsContainer.append(img);
 }
 
 function displayError(message: string) {
@@ -151,8 +106,6 @@ function displayError(message: string) {
 
 function clearResults() {
   resultsContainer.innerHTML = '';
-  geminiOutputContainer.classList.add('hidden');
-  geminiTextContainer.innerHTML = '';
 }
 
 function showLoader(isLoading: boolean) {
