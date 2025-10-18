@@ -1,7 +1,6 @@
-
 # Discogs Cover Art Finder
 
-A simple and powerful tool to find and download the main cover art for any album from Discogs. It can be used as a command-line tool or as a library in your own Node.js projects.
+A simple and powerful tool to find and download the main cover art for any album from Discogs. It can be used as a command-line tool or as a library in your own Node.js projects. Now in TypeScript!
 
 ## Setup
 
@@ -27,14 +26,24 @@ A simple and powerful tool to find and download the main cover art for any album
     ```
     DISCOGS_TOKEN=YourDiscogsTokenGoesHere
     ```
+5.  **Build the project:**
+    This project is written in TypeScript. You need to compile it to JavaScript before running.
+    ```bash
+    npm run build
+    ```
 
 ## CLI Usage
 
-The command-line tool allows you to quickly download cover art from your terminal. It will interactively prompt you if multiple matches are found.
+After building the project (`npm run build`), you can run the CLI. It will interactively prompt you if multiple matches are found.
 
 **Syntax:**
 ```bash
-node discogs-cover-cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
+node dist/discogs-cover-cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
+```
+
+Or using npm:
+```bash
+npm start -- -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
 ```
 
 **Arguments:**
@@ -44,7 +53,12 @@ node discogs-cover-cli.js -artist="<Artist Name>" -title="<Album Title>" [-targe
 
 **Example:**
 ```bash
-node discogs-cover-cli.js -artist="Daft Punk" -title="Discovery" -target="./downloads"
+npm start -- -artist="Daft Punk" -title="Discovery" -target="./downloads"
+```
+
+If you install the package globally (`npm install -g .`), you can use the command directly:
+```bash
+discogs-cover -artist="Daft Punk" -title="Discovery"
 ```
 
 ## Library Usage
@@ -56,35 +70,51 @@ You can import the core function into your own Node.js projects to programmatica
 npm install @hansogj/discogs-cover
 ```
 
-**Example:**
-```javascript
+**Example (TypeScript):**
+```typescript
 import { discogsMainCover } from '@hansogj/discogs-cover';
 import * as fs from 'node:fs';
 
-// --- Option 1: Get the first result automatically ---
-try {
-  const imageBuffer = await discogsMainCover({
-    artist: 'Daft Punk',
-    title: 'Discovery',
-    strategy: 'first', // 'first' is the default
-  });
-  fs.writeFileSync('daft-punk-cover.jpg', imageBuffer);
-  console.log('Cover saved!');
-} catch (error) {
-  console.error(error.message);
+// --- Get the first result automatically (using async/await) ---
+async function getFirstCover() {
+  try {
+    const imageBuffer: Buffer = await discogsMainCover({
+      artist: 'Daft Punk',
+      title: 'Discovery',
+      strategy: 'first', // 'first' is the default
+    });
+    fs.writeFileSync('daft-punk-cover.jpg', imageBuffer);
+    console.log('Cover saved!');
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error('An unknown error occurred', error);
+    }
+  }
 }
 
+getFirstCover();
 
-// --- Option 2: Prompt the user in the console if multiple matches exist ---
-try {
-  const imageBuffer = await discogsMainCover({
-    artist: 'Radiohead',
-    title: 'OK Computer',
-    strategy: 'prompt', // Will ask user to choose from a list
-  });
-  fs.writeFileSync('radiohead-cover.jpg', imageBuffer);
-  console.log('Cover saved!');
-} catch (error) {
-  console.error(error.message);
+
+// --- Prompt the user if multiple matches exist ---
+async function getCoverWithPrompt() {
+  try {
+    const imageBuffer: Buffer = await discogsMainCover({
+      artist: 'Radiohead',
+      title: 'OK Computer',
+      strategy: 'prompt', // Will ask user to choose from a list
+    });
+    fs.writeFileSync('radiohead-cover.jpg', imageBuffer);
+    console.log('Cover saved!');
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error('An unknown error occurred', error);
+    }
+  }
 }
+
+getCoverWithPrompt();
 ```
