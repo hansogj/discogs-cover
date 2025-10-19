@@ -1,6 +1,6 @@
 {
   "name": "@hansogj/discogs-cover",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A library and CLI to find and download album cover art from Discogs.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
