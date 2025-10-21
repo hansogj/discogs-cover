@@ -1,23 +1,22 @@
 {
   "name": "@hansogj/discogs-cover",
-  "version": "1.2.3",
+  "version": "1.2.0",
   "description": "A library and CLI to find and download album cover art from Discogs.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "access": "public",
   "bin": {
-    "discogs-cover": "dist/index.js"
+    "discogs-cover": "dist/src/cli.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "cli": "node dist/index.js",
+    "cli": "node dist/src/cli.js",
     "build": "tsc",
     "clean": "rm -rf dist *.tgz",
     "prepublishOnly": "npm run clean && npm run build",
     "prepack": "npm run prepublishOnly",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "keywords": [
     "discogs",
@@ -29,10 +28,11 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dotenv": "16.4.5"
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "@types/node": "20.12.12",
-    "typescript": "5.4.5"
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
   }
 }
