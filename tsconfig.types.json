@@ -3,6 +3,7 @@
   "compilerOptions": {
     "declaration": true,
     "emitDeclarationOnly": true,
+    "module": "NodeNext",
     "moduleResolution": "nodenext",
     "outDir": "./dist/types"
   }
