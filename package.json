@@ -2,21 +2,32 @@
   "name": "@hansogj/discogs-cover",
   "version": "1.2.0",
   "description": "A library and CLI to find and download album cover art from Discogs.",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "bin": {
-    "discogs-cover": "dist/src/cli.js"
+    "discogs-cover": "./dist/cjs/src/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "cli": "node dist/src/cli.js",
-    "build": "tsc",
+    "cli": "node dist/cjs/src/cli.js",
+    "build": "pnpm clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && tsc -p tsconfig.types.json",
     "clean": "rm -rf dist *.tgz",
-    "prepublishOnly": "pnpm clean && pnpm build",
-    "prepack": "pnpm prepublishOnly",
+    "prepublishOnly": "pnpm build",
     "test": "vitest"
   },
   "keywords": [

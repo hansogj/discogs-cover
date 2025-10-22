@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fetchDiscogs, downloadImage } from './discogs-client.js';
+import { fetchDiscogs, downloadImage } from './discogs-client';
 
 const mockSuccessResponse = (data: any) => ({
     ok: true,

@@ -1,6 +1,6 @@
 import * as readline from 'node:readline';
-import { fetchDiscogs, downloadImage, DISCOGS_API_URL } from './discogs-client.js';
-import type { DiscogsCoverOptions, DiscogsSearchResponse, DiscogsSearchResult, DiscogsMasterReleaseResponse } from './types.js';
+import { fetchDiscogs, downloadImage, DISCOGS_API_URL } from './discogs-client';
+import type { DiscogsCoverOptions, DiscogsSearchResponse, DiscogsSearchResult, DiscogsMasterReleaseResponse } from './types';
 
 function promptUser(query: string): Promise<string> {
     const rl = readline.createInterface({
