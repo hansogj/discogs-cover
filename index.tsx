@@ -1,2 +1,2 @@
-export { discogsMainCover } from './src/main';
-export * from './src/types';
+export { discogsMainCover } from './src/main.js';
+export * from './src/types.js';

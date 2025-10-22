@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as discogsClient from './discogs-client';
+import * as discogsClient from './discogs-client.js';
 import * as readline from 'node:readline';
-import { discogsMainCover } from './main';
-import type { DiscogsMasterReleaseResponse, DiscogsSearchResponse } from './types';
+import { discogsMainCover } from './main.js';
+import type { DiscogsMasterReleaseResponse, DiscogsSearchResponse } from './types.js';
 
 // Mock the entire discogs-client module
-vi.mock('./discogs-client');
+vi.mock('./discogs-client.js');
 
 // Mock the readline module
 vi.mock('node:readline');

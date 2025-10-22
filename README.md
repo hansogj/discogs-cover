@@ -4,46 +4,54 @@ A simple and powerful tool to find and download the main cover art for any album
 
 ## Setup
 
-1.  **Clone the repository and install dependencies:**
+This project uses `pnpm` as its package manager.
+
+1.  **Install pnpm:**
+    If you don't have pnpm, you can install it globally with npm:
     ```bash
-    npm install
+    npm install -g pnpm
     ```
 
-2.  **Create a `.env` file:**
+2.  **Clone the repository and install dependencies:**
+    ```bash
+    pnpm install
+    ```
+
+3.  **Create a `.env` file:**
     Copy the `.env.example` to a new file named `.env`.
 
     ```bash
     cp .env.example .env
     ```
 
-3.  **Get a Discogs Personal Access Token:**
+4.  **Get a Discogs Personal Access Token:**
     *   Go to your Discogs [Developer Settings](https://www.discogs.com/settings/developers).
     *   Click "Generate new token".
     *   Copy the generated token.
 
-4.  **Add your token to the `.env` file:**
+5.  **Add your token to the `.env` file:**
     Open your `.env` file and paste your token:
     ```
     DISCOGS_TOKEN=YourDiscogsTokenGoesHere
     ```
-5.  **Build the project:**
+6.  **Build the project:**
     This project is written in TypeScript. You need to compile it to JavaScript before running.
     ```bash
-    npm run build
+    pnpm build
     ```
 
 ## CLI Usage
 
-After building the project (`npm run build`), you can run the CLI. It will interactively prompt you if multiple matches are found.
+After building the project (`pnpm build`), you can run the CLI. It will interactively prompt you if multiple matches are found.
 
 **Syntax:**
 ```bash
 node dist/src/cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
 ```
 
-Or using the npm script:
+Or using the pnpm script:
 ```bash
-npm run cli -- -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
+pnpm cli -- -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
 ```
 
 **Arguments:**
@@ -53,10 +61,10 @@ npm run cli -- -artist="<Artist Name>" -title="<Album Title>" [-target="</path/t
 
 **Example:**
 ```bash
-npm run cli -- -artist="Daft Punk" -title="Discovery" -target="./downloads"
+pnpm cli -- -artist="Daft Punk" -title="Discovery" -target="./downloads"
 ```
 
-If you install the package globally (`npm install -g .`), you can use the command directly:
+If you install the package globally (`pnpm add -g .`), you can use the command directly:
 ```bash
 discogs-cover -artist="Daft Punk" -title="Discovery"
 ```
@@ -67,7 +75,7 @@ You can import the core function into your own Node.js projects to programmatica
 
 **Installation:**
 ```bash
-npm install @hansogj/discogs-cover
+pnpm add @hansogj/discogs-cover
 ```
 
 **Using Environment Variables (`.env`)**
@@ -76,7 +84,7 @@ The `discogsMainCover` function is designed to automatically use the `DISCOGS_TO
 
 1.  Install `dotenv`:
     ```bash
-    npm install dotenv
+    pnpm add dotenv
     ```
 
 2.  Load the `.env` file at the very start of your script by adding `import 'dotenv/config';`.

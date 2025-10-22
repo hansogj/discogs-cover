@@ -2,7 +2,7 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { discogsMainCover } from './main';
+import { discogsMainCover } from './main.js';
 
 dotenv.config();
 
