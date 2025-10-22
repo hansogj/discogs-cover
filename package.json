@@ -1,6 +1,6 @@
 {
   "name": "@hansogj/discogs-cover",
-  "version": "1.2.0",
+  "version": "1.2.3-1",
   "description": "A library and CLI to find and download album cover art from Discogs.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,11 +28,11 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "dotenv": "16.4.5"
   },
   "devDependencies": {
-    "@types/node": "^20.12.12",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "@types/node": "20.12.12",
+    "typescript": "5.4.5",
+    "vitest": "^3.2.4"
   }
 }
