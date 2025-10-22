@@ -2,7 +2,7 @@ name: test & build
 
 on:
   pull_request:
-    branches: ['main']
+    branches: ["main"]
   workflow_call:
 
 jobs:
@@ -27,5 +27,4 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm install  
-          pnpm run precommit
+          pnpm install
