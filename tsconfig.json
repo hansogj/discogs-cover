@@ -5,11 +5,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "preserve"
+    "rootDir": "src"
   },
   "include": [
-    "src/**/*.ts",
-    "index.tsx"
+    "src"
   ],
   "exclude": [
     "node_modules",

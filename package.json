@@ -6,7 +6,7 @@
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "bin": {
-    "discogs-cover": "./dist/cjs/src/cli.js"
+    "discogs-cover": "./dist/cjs/cli.js"
   },
   "exports": {
     ".": {
@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "cli": "node dist/cjs/src/cli.js",
+    "cli": "node dist/cjs/cli.js",
     "build": "pnpm clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && tsc -p tsconfig.types.json",
     "clean": "rm -rf dist *.tgz",
     "prepublishOnly": "pnpm build",
