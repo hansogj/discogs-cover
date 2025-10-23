@@ -22,7 +22,7 @@ jobs:
       - run: pnpm i --frozen-lockfile
 
       # The publish command should now be authorized via the .npmrc file
-      - run: pnpm publish --no-git-checks
+      - run: pnpm publish --access public --no-git-checks
         # NOTE: The env block below is now redundant but harmless,
         # as the auth is handled by the .npmrc file setup above.
         env:

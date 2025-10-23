@@ -42,7 +42,13 @@
     "art",
     "cli"
   ],
-  "author": "",
+  "author": " hansogj",
+  "contributors": [
+    {
+      "name": "Hans Ole Gjerdrum",
+      "email": "hansogj@gmail.com"
+    }
+  ],
   "license": "Apache-2.0",
   "packageManager": "pnpm@9.1.4",
   "dependencies": {
