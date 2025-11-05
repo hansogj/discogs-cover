@@ -8,11 +8,13 @@ This project uses `pnpm` as its package manager.
 
 1.  **Install pnpm:**
     If you don't have pnpm, you can install it globally with npm:
+
     ```bash
     npm install -g pnpm
     ```
 
 2.  **Clone the repository and install dependencies:**
+
     ```bash
     pnpm install
     ```
@@ -25,9 +27,9 @@ This project uses `pnpm` as its package manager.
     ```
 
 4.  **Get a Discogs Personal Access Token:**
-    *   Go to your Discogs [Developer Settings](https://www.discogs.com/settings/developers).
-    *   Click "Generate new token".
-    *   Copy the generated token.
+    - Go to your Discogs [Developer Settings](https://www.discogs.com/settings/developers).
+    - Click "Generate new token".
+    - Copy the generated token.
 
 5.  **Add your token to the `.env` file:**
     Open your `.env` file and paste your token:
@@ -45,26 +47,31 @@ This project uses `pnpm` as its package manager.
 After building the project (`pnpm build`), you can run the CLI. It will interactively prompt you if multiple matches are found.
 
 **Syntax:**
+
 ```bash
 node dist/src/cli.js -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
 ```
 
 Or using the pnpm script:
+
 ```bash
 pnpm cli -- -artist="<Artist Name>" -title="<Album Title>" [-target="</path/to/save>"]
 ```
 
 **Arguments:**
-*   `-artist`: The name of the artist (required).
-*   `-title`: The title of the album (required).
-*   `-target`: The folder where `cover.jpg` will be saved. Defaults to the current directory (`.`).
+
+- `-artist`: The name of the artist (required).
+- `-title`: The title of the album (required).
+- `-target`: The folder where `cover.jpg` will be saved. Defaults to the current directory (`.`).
 
 **Example:**
+
 ```bash
 pnpm cli -- -artist="Daft Punk" -title="Discovery" -target="./downloads"
 ```
 
 If you install the package globally (`pnpm add -g .`), you can use the command directly:
+
 ```bash
 discogs-cover -artist="Daft Punk" -title="Discovery"
 ```
@@ -74,6 +81,7 @@ discogs-cover -artist="Daft Punk" -title="Discovery"
 You can import the core function into your own Node.js projects to programmatically fetch cover art.
 
 **Installation:**
+
 ```bash
 pnpm add @hansogj/discogs-cover
 ```
@@ -83,6 +91,7 @@ pnpm add @hansogj/discogs-cover
 The `discogsMainCover` function is designed to automatically use the `DISCOGS_TOKEN` from your environment variables. To load this token from a `.env` file in your own project, you'll need the `dotenv` package.
 
 1.  Install `dotenv`:
+
     ```bash
     pnpm add dotenv
     ```
@@ -92,6 +101,7 @@ The `discogsMainCover` function is designed to automatically use the `DISCOGS_TO
 This setup allows you to call `discogsMainCover` without manually passing the token, as it will be picked up from `process.env`.
 
 **Example (TypeScript):**
+
 ```typescript
 import { discogsMainCover } from '@hansogj/discogs-cover';
 import * as fs from 'node:fs';
@@ -119,7 +129,6 @@ async function getFirstCover() {
 }
 
 getFirstCover();
-
 
 // --- Prompt the user if multiple matches exist ---
 async function getCoverWithPrompt() {

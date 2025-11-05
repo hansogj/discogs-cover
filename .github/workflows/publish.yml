@@ -9,8 +9,8 @@ jobs:
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
-          node-version: "21.x"
-          registry-url: "https://registry.npmjs.org"
+          node-version: '21.x'
+          registry-url: 'https://registry.npmjs.org'
           # 🚨 FIX: Pass the secret token directly to setup-node
           # This automatically writes the token to the runner's .npmrc file
           token: ${{ secrets.NPM_TOKEN }}
