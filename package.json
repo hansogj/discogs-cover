@@ -28,6 +28,7 @@
     "build": "pnpm clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && tsc -p tsconfig.types.json",
     "clean": "rm -rf dist *.tgz",
     "prepack": "pnpm format:check && pnpm test &&  pnpm build",
+    "precommit": "pnpm prepack",
     "prepublishOnly": "pnpm build",
     "test": "vitest run",
     "test:watch": "vitest",
