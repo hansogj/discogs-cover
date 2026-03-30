@@ -69,6 +69,7 @@ describe('discogsMainCover', () => {
   });
 
   it('should throw an error if no Discogs token is provided', async () => {
+    vi.stubEnv('DISCOGS_TOKEN', undefined);
     await expect(discogsMainCover({ artist: 'A', title: 'B', token: undefined })).rejects.toThrow(
       'Discogs token is missing.',
     );
